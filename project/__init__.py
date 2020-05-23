@@ -1,9 +1,10 @@
 import os
-from flask import Flask, jsonify
-from flask_restx import Resource, Api
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 #instantiate the db
+# https://flask.palletsprojects.com/en/1.1.x/extensiondev/
+# Using this design pattern, no application-specific state is stored on the extension object, so one extension object can be used for multiple apps
 db = SQLAlchemy()
 
 
@@ -17,6 +18,7 @@ def create_app(script_info=None):
     app.config.from_object(app_settings)
 
     # set up extensions
+    # all flask extensions must support factory pattern
     db.init_app(app)
 
     #register blueprints
