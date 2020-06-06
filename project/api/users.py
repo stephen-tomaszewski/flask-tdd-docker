@@ -8,6 +8,7 @@ from project.api.models import User
 users_blueprint = Blueprint('users', __name__)
 api = Api(users_blueprint)
 
+# wrapper around SQLAlchemy model to enable payload validation
 user = api.model('User', {
     'id': fields.Integer(readOnly=True),
     'username': fields.String(required=True),
@@ -18,6 +19,7 @@ user = api.model('User', {
 
 class UsersList(Resource):
 
+    # validate param allows validation and throws error otherwise
     @api.expect(user, validate=True)
     def post(self):
         post_data = request.get_json()
@@ -34,5 +36,18 @@ class UsersList(Resource):
         response_object['message'] = f'{email} was added!'
         return response_object, 201
 
+    @api.marshal_with(user, as_list=True)
+    def get(self):
+        return User.query.all(), 200
+
+
+class Users(Resource):
+    # https://flask-restx.readthedocs.io/en/stable/marshalling.html
+    # TODO when does marshal convert dict to bytes?
+    @api.marshal_with(user)
+    def get(self, user_id):
+        return User.query.filter_by(id=user_id).first(), 200
+
 
 api.add_resource(UsersList, '/users')
+api.add_resource(Users, '/users/<int:user_id>')

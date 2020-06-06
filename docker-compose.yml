@@ -18,6 +18,8 @@ services:
             - DATABASE_TEST_URL=postgresql://postgres:postgres@users-db:5432/users_test
         depends_on:
             - users-db
+        stdin_open: true
+        tty: true
 
     users-db:
         build:
